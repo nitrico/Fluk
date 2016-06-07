@@ -1,0 +1,86 @@
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+//apply plugin: 'org.jetbrains.dokka'
+
+def libName = 'fluk'
+def libGroupId = 'com.github.nitrico.fluk'
+def libDescription = 'Dead easy Flux architecture for Android with Kotlin'
+def libWebsite = 'https://github.com/nitrico/fluk'
+def libTracker = 'https://github.com/nitrico/fluk/issues'
+def libGit = 'https://github.com/nitrico/fluk.git'
+
+group = libGroupId
+version = '0.1.0'
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+bintray {
+    user = properties.getProperty('bintray.user')
+    key = properties.getProperty('bintray.key')
+    configurations = ['archives']
+    pkg {
+        repo = 'maven'
+        name = libName
+        desc = libDescription
+        websiteUrl = libWebsite
+        issueTrackerUrl = libTracker
+        vcsUrl = libGit
+        licenses = ["Apache-2.0"]
+        labels = ['android', 'flux', 'architecture', 'kotlin']
+        publish = true
+        publicDownloadNumbers = true
+    }
+}
+
+install {
+    repositories.mavenInstaller {
+        pom.project {
+            packaging 'aar'
+            groupId libGroupId
+            artifactId libName
+            name libName
+            description libDescription
+            url libWebsite
+
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                }
+            }
+            developers {
+                developer {
+                    id 'moreno'
+                    name 'Miguel Ángel Moreno'
+                    email 'nitrico@gmail.com'
+                }
+            }
+            scm {
+                connection libGit
+                developerConnection libGit
+                url libWebsite
+            }
+        }
+    }
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+/*task dokkaJavadoc(type: org.jetbrains.dokka.gradle.DokkaTask) {
+    outputFormat = 'javadoc'
+    outputDirectory = "$buildDir/javadoc"
+}
+
+task dokkaJavadocJar(type: Jar, dependsOn: dokkaJavadoc) {
+    classifier = 'javadoc'
+    from dokkaJavadoc.outputDirectory
+}*/
+
+artifacts {
+    //archives dokkaJavadocJar
+    archives sourcesJar
+}
